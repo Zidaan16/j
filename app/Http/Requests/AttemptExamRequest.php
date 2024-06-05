@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 
-class ChangePasswordRequest extends FormRequest
+class AttemptExamRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,17 +23,17 @@ class ChangePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'new_password' => 'required'
+            'exam_id' => 'required',
         ];
     }
 
     public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
         $res = response()->json([
-            'msg' => 'New password cannot be empty.'
+            'msg' => 'Classroom id or question id is required.'
         ], 400);
 
-        throw new ValidationException($validator, $res);
+        throw new ValidationException($validator,$res);
+        
     }
-
 }

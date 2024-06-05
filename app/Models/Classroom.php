@@ -11,5 +11,16 @@ class Classroom extends Model
     protected $fillable = [
         'name'
     ];
+
+    public function exam()
+    {
+        return $this->hasMany(Exam::class);
+    }
+
+    public function user()
+    {
+        return $this->hasMany(User::class);
+    }
+
     use HasFactory;
 }

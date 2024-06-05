@@ -31,7 +31,7 @@ class LoginRequest extends FormRequest
     {
         $res = response()->json([
             'msg' => 'Email or Password cannot be empty'
-        ], 406);
+        ], 400);
 
         throw new ValidationException($validator,$res);
         
