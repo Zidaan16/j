@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
@@ -24,7 +25,7 @@ Route::prefix('admin')->controller(AdminController::class)->group(function (){
     Route::post('/login', 'login');
 
     Route::middleware('auth:sanctum')->group(function (){
-        
+        Route::post('/change_password', 'change_password');
     });
 });
 
@@ -41,12 +42,12 @@ Route::prefix('user')->controller(UserController::class)->group(function (){
     
 });
 
-// Student
+// Student (role teacher)
 Route::prefix('user')->controller(StudentController::class)->group(function (){
     Route::middleware('auth:sanctum')->group(function (){
         Route::get('/active', 'getActiveUsers');
         Route::get('/unactive', 'getUnactiveUsers');
-        Route::put('/activation/{id}', 'userActivation');
+        Route::get('/activation/{id}', 'userActivation');
         Route::delete('/delete/{id}', 'delete');
     });
 });
@@ -74,3 +75,6 @@ Route::prefix('classroom')->controller(ClassroomController::class)->group(functi
         Route::delete('/delete/{id}', 'delete');
     });
 });
+
+// Pages
+Route::get('/page/login', [PageController::class, 'login']);

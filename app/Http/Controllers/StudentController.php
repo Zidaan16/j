@@ -25,9 +25,9 @@ class StudentController extends Controller
         if ($user->tokenCan('user:get_all')) {
             return $this->getUser(false);
         } else {
-            return response()->json([
-                'msg' => 'Unauthorized'
-            ], 401);
+           return response()->json([
+               'msg' => 'Unauthorized'
+           ], 401);
         }
     }
 
@@ -39,7 +39,7 @@ class StudentController extends Controller
                 'msg' => 'Unauthorized'
             ], 401);
         }
-
+        
         $user = User::find($id);
         if (empty($user)) {
             return response()->json([

@@ -98,7 +98,11 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->tokenCan('user:change_password')) return redirect()->route('login');
+        if (!$user->tokenCan('user:change_password')) {
+            return response()->json([
+                'msg' => 'Unauthorized'
+            ], 401);
+        }
 
         $user->forceFill([
             'password' => $request->new_password

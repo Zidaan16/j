@@ -33,6 +33,7 @@ class ExamController extends Controller
                 'msg' => 'Unauthorized'
             ], 401);
         }
+
         $class = Classroom::find($request->classroom_id);
         if (empty($class)) {
             return response()->json([

@@ -49,11 +49,34 @@ class AdminController extends Controller
         }
     }
 
+    public function change_password(ChangePasswordRequest $request)
+    {
+        $user = $request->user();
+        if (!$user->tokenCan('admin:change_password')) {
+            return response()->json([
+                'msg' => 'Unauthorized'
+            ], 401);
+        }
+
+        $user->forceFill([
+            'password' => $request->new_password
+        ]);
+        $user->save();
+
+        $user->tokens()->delete();
+
+        return response()->json([
+            'msg' => 'Change password successfully, please login again'
+        ], 205);
+    }
+
     private function tokenAbilities()
     {
         return [
-            'user:change_password',
+            'admin:change_password',
             'user:get_all',
+            'user:activation',
+            'user:delete',
             'exam:get_all',
             'exam:create',
             'classroom:create',
