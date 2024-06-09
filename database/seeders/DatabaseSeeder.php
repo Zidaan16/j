@@ -68,5 +68,35 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('zidan'),
             'classroom_id' => $rpl1->id,
         ]);
+
+        $exam = Exam::create([
+            'classroom_id' => 1,
+            'title' => 'Matematika',
+
+        ]);
+
+        $exam->question()->create([
+            'point' => 1,
+            'description' => '5 + 5 = ...?',
+            'option_1' => 5,
+            'option_2' => 15,
+            'option_3' => 8,
+            'correct_answer' => 10
+        ]);
+
+        $exam->question()->create([
+            'point' => 1,
+            'description' => '10 + 10 = ...?',
+            'option_1' => 5,
+            'option_2' => 15,
+            'option_3' => 8,
+            'correct_answer' => 20
+        ]);
+
+        $exam->question()->create([
+            'point' => 5,
+            'description' => '1000 + 2000cu = ...?',
+            'auto' => false
+        ]);
     }
 }

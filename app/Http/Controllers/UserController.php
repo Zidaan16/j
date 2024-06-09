@@ -6,7 +6,6 @@ use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\Classroom;
 use App\Models\Role;
-use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
@@ -91,7 +90,12 @@ class UserController extends Controller
     public function profile(Request $request)
     {
         $user = $request->user();
-        return response()->json($user->only('id', 'email', 'name'));
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'classroom' => $user->classroom->name
+        ]);
     }
 
     public function change_password(ChangePasswordRequest $request)
@@ -116,10 +120,9 @@ class UserController extends Controller
         ], 205);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        $user = Auth::user();
-        $user->tokens()->delete();
+        $request->token()->delete();
 
         return response()->json([
             'msg' => 'Logout'

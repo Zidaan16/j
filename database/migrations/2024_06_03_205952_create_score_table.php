@@ -11,29 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::create('score', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->unsignedBigInteger('student_id');
-        //     $table->unsignedBigInteger('exam_id');
-        //     $table->integer('total');
-        //     $table->timestamps();
+        Schema::create('score', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('exam_id');
+            $table->integer('total');
+            $table->timestamps();
 
-        //     $table->foreign('student_id')->references('id')->on('student')->onDelete('cascade');
-        //     $table->foreign('exam_id')->references('id')->on('exam')->onDelete('cascade');
-        // });
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('exam_id')->references('id')->on('exam')->onDelete('cascade');
+        });
 
-        // Schema::create('answer', function (Blueprint $table){
-        //     $table->id();
-        //     $table->unsignedBigInteger('student_id');
-        //     $table->unsignedBigInteger('exam_id');
-        //     $table->text('question');
-        //     $table->string('answer')->nullable();
-        //     $table->boolean('status')->default(false);
-        //     $table->timestamps();
+        Schema::create('answer', function (Blueprint $table){
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('exam_id');
+            $table->text('question');
+            $table->string('answer')->nullable();
+            $table->mediumInteger('point');
+            $table->boolean('status')->default(false);
+            $table->timestamps();
 
-        //     $table->foreign('student_id')->references('id')->on('student')->onDelete('cascade');
-        //     $table->foreign('exam_id')->references('id')->on('exam')->onDelete('cascade');
-        // });
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('exam_id')->references('id')->on('exam')->onDelete('cascade');
+        });
     }
 
     /**

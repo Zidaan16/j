@@ -86,23 +86,15 @@ class ExamController extends Controller
                 'msg' => 'Unauthorized'
             ], 401);
         }
-
-        $student = $user->student;
-        $exam = Exam::find($request->exam_id);
-
-        if (empty($exam)) {
+        $check = Answer::where('user_id', $user->id)->where('exam_id', $request->exam_id)->count();
+        if ($check > 0) {
             return response()->json([
-                'msg' => "Exam with id $request->exam_id not exists." 
+                'msg' => 'You have answering this exam.'
             ], 400);
         }
 
-        if (!empty($exam->answer()->where('student_id', $student->id))) {
-            return response()->json([
-                'msg' => "You have answered this exam"
-            ], 406);
-        }
-
-        $question = $exam->question()->get();
+        $exam = $user->classroom->exam()->find($request->exam_id);
+        $question = $exam->question;
         $clientAnswer = $request->answer;
 
         for ($i=0; $i < count($question); $i++) { 
@@ -110,36 +102,42 @@ class ExamController extends Controller
                 if ($question[$i]->auto) {
                     if ($question[$i]->correct_answer == $clientAnswer[$i]) {
                         $exam->answer()->create([
-                            'student_id' => $student->id,
+                            'user_id' => $user->id,
                             'question' => $question[$i]->description,
                             'answer' => $clientAnswer[$i],
+                            'point' => $question[$i]->point,
                             'status' => true
                         ]);
                     } else {
                         $exam->answer()->create([
-                            'student_id' => $student->id,
+                            'user_id' => $user->id,
                             'question' => $question[$i]->description,
                             'answer' => $clientAnswer[$i],
+                            'point' => $question[$i]->point,
                         ]);
                     }
                 } else {
                     $exam->answer()->create([
-                        'student_id' => $student->id,
+                        'user_id' => $user->id,
                         'question' => $question[$i]->description,
                         'answer' => $clientAnswer[$i],
+                        'point' => $question[$i]->point,
                     ]);
                 }
 
             } else {
                 $exam->answer()->create([
-                    'student_id' => $student->id,
+                    'user_id' => $user->id,
                     'question' => $question[$i]->description,
                     'answer' => null,
+                    'point' => $question[$i]->point
                 ]);
             }
         }
 
-        return response()->json($student->id);
+        return response()->json([
+            'msg' => 'OK'
+        ]);
     }
 
     public function view(Request $request, String $id)

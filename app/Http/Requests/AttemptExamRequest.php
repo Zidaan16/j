@@ -30,7 +30,7 @@ class AttemptExamRequest extends FormRequest
     public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
         $res = response()->json([
-            'msg' => 'Classroom id or question id is required.'
+            'msg' => 'exam_id is required.'
         ], 400);
 
         throw new ValidationException($validator,$res);

@@ -10,7 +10,8 @@ class Answer extends Model
     protected $table = 'answer';
     protected $fillable = [
         'exam_id',
-        'student_id',
+        'user_id',
+        'point',
         'question',
         'answer',
         'status'
@@ -19,11 +20,6 @@ class Answer extends Model
     public function exam()
     {
         return $this->belongsTo(Exam::class);
-    }
-
-    public function student()
-    {
-        return $this->belongsTo(Student::class);
     }
 
     use HasFactory;
