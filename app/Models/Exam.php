@@ -28,5 +28,10 @@ class Exam extends Model
         return $this->hasMany(Answer::class);
     }
 
+    public function score()
+    {
+        return $this->hasMany(Score::class);
+    }
+
     use HasFactory;
 }

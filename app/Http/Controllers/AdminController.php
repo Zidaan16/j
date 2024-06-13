@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Student;
-use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\ChangePasswordRequest;
@@ -49,6 +47,11 @@ class AdminController extends Controller
         }
     }
 
+    public function dashboard(Request $request)
+    {
+        
+    }
+
     public function change_password(ChangePasswordRequest $request)
     {
         $user = $request->user();
@@ -70,6 +73,15 @@ class AdminController extends Controller
         ], 205);
     }
 
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+
+        return response()->json([
+            'msg' => 'Logout'
+        ], 205);
+    }
+
     private function tokenAbilities()
     {
         return [
@@ -82,7 +94,10 @@ class AdminController extends Controller
             'classroom:create',
             'classroom:read',
             'classroom:update',
-            'classroom:delete'
+            'classroom:delete',
+            'answer:get_all',
+            'answer:read',
+            'score:update'
         ];
     }
 

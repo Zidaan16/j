@@ -3,17 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClassroomRequest;
+use App\Http\Resources\ClassroomResource;
 use App\Models\Classroom;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ClassroomController extends Controller
 {
     public function index()
     {
-        $data = [];
-        $data['data'] = Classroom::select('id', 'name', 'created_at')->get();
-
-        return $data;
+        return ClassroomResource::collection(Classroom::first());
     }
 
     public function create(ClassroomRequest $request)
@@ -58,9 +57,7 @@ class ClassroomController extends Controller
         }
 
         $result = $class;
-        for ($i=0; $i < $class->user()->count(); $i++) { 
-            $result['student'] = $class->user()->where('status', true)->get(['id', 'name', 'email', 'created_at', 'updated_at']);
-        }
+        $result['student'] = $class->user()->get(['id', 'name', 'email', 'created_at', 'updated_at']);
 
         return response()->json($result);
     }

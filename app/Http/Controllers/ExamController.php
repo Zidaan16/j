@@ -8,6 +8,7 @@ use App\Models\Answer;
 use App\Models\Classroom;
 use App\Models\Exam;
 use App\Models\Question;
+use App\Models\Score;
 use Illuminate\Http\Request;
 
 class ExamController extends Controller
@@ -15,7 +16,7 @@ class ExamController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        if (!$user->tokenCan('exam:view')) {
+        if (!$user->tokenCan('exam:read')) {
             return response()->json([
                 'msg' => 'Unauthorized'
             ], 401);
@@ -86,21 +87,25 @@ class ExamController extends Controller
                 'msg' => 'Unauthorized'
             ], 401);
         }
-        $check = Answer::where('user_id', $user->id)->where('exam_id', $request->exam_id)->count();
-        if ($check > 0) {
+        $check = Score::where('exam_id', $request->exam_id)->where('user_id', $user->id)->exists();
+        if ($check) {
             return response()->json([
                 'msg' => 'You have answering this exam.'
             ], 400);
         }
 
+        $total_point = 0;
+        $point = 0;
         $exam = $user->classroom->exam()->find($request->exam_id);
         $question = $exam->question;
         $clientAnswer = $request->answer;
 
         for ($i=0; $i < count($question); $i++) { 
+            $total_point+=$question[$i]->point;
             if (!empty($clientAnswer[$i])) {
                 if ($question[$i]->auto) {
                     if ($question[$i]->correct_answer == $clientAnswer[$i]) {
+                        $point += $question[$i]->point;
                         $exam->answer()->create([
                             'user_id' => $user->id,
                             'question' => $question[$i]->description,
@@ -135,15 +140,21 @@ class ExamController extends Controller
             }
         }
 
+        $exam->score()->create([
+            'user_id' => $user->id,
+            'true' => $point,
+            'total' => $total_point
+        ]);
+
         return response()->json([
             'msg' => 'OK'
         ]);
     }
 
-    public function view(Request $request, String $id)
+    public function read(Request $request, String $id)
     {
         $user = $request->user();
-        if (!$user->tokenCan('exam:view')) {
+        if (!$user->tokenCan('exam:read')) {
             return response()->json([
                 'msg' => 'Unauthorized'
             ], 401);

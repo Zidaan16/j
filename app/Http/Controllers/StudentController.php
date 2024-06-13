@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\StudentResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -80,17 +81,6 @@ class StudentController extends Controller
 
     private function getUser(Bool $status)
     {
-        $data['data'] = [];
-        foreach (User::where('role_id', 1)->where('status', $status)->get() as $value) {
-            $data['data'][] = [
-                'id' => $value['id'],
-                'name' => $value['name'],
-                'email' => $value['email'],
-                'classroom' => $value->classroom->name,
-                'created_at' => $value['created_at'],
-                'updated_at' => $value['updated_at']
-            ];
-        }
-        return response()->json($data);
+        return StudentResource::collection(User::where('role_id', 1)->where('status', $status)->paginate(15));
     }
 }

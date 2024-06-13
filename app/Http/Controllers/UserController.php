@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\StudentResource;
+use App\Http\Resources\StudentScoreResource;
 use App\Models\Classroom;
+use App\Models\Exam;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,6 +17,11 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function register_attributes()
+    {
+        return response()->json(['data' => Classroom::select('id', 'name')->get()]);
+    }
+
     public function register(RegisterRequest $request)
     {
         if (User::where('role_id', 1)->where('email', $request->email)->exists()) {
@@ -56,46 +64,32 @@ class UserController extends Controller
         }
 
         $token = $student->tokens();
-
         $abilities = [
             'user:change_password',
             'exam:attempt',
-            'exam:view'
+            'exam:read',
+            'score:read'
         ];
 
-        if ($token->exists()) {
-            $name = $token->value('name');
-            $token->delete();
-            return response()->json([
-                'id' => $student->id,
-                'name' => $student->name,
-                'email' => $student->email,
-                'classroom' => $student->classroom->name,
-                'created_at' => $student->created_at,
-                'token' => $student->createToken($name, $abilities)->plainTextToken
-            ]);
-        } else {
-            return response()->json([
-                'id' => $student->id,
-                'name' => $student->name,
-                'email' => $student->email,
-                'classroom' => $student->classroom->name,
-                'created_at' => $student->created_at,
-                'token' => $student->createToken($student->email, $abilities)->plainTextToken
-            ]);
-        }
+        if ($token->exists()) $token->delete();
 
+        return StudentResource::make($student)->additional(['token' => $student->createToken($student->email, $abilities)->plainTextToken]);
     }
 
-    public function profile(Request $request)
+    public function dashboard(Request $request)
     {
         $user = $request->user();
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'classroom' => $user->classroom->name
-        ]);
+        $data = [];
+        foreach ($user->classroom->exam()->where('is_expired', false)->get() as $key => $value) {
+            if (!$user->score()->where('exam_id', $value['id'])->exists()) {
+                $data[] = [
+                    'id' => $value['id'],
+                    'title' => $value['title']
+                ];
+            }
+        }
+        $resource = StudentResource::make($user)->additional(['exam' => $data]);
+        return $resource;
     }
 
     public function change_password(ChangePasswordRequest $request)
@@ -112,7 +106,6 @@ class UserController extends Controller
             'password' => $request->new_password
         ]);
         $user->save();
-
         $user->tokens()->delete();
 
         return response()->json([
@@ -120,9 +113,14 @@ class UserController extends Controller
         ], 205);
     }
 
+    public function score(Request $request)
+    {
+        return StudentScoreResource::collection($request->user()->score);
+    }
+
     public function logout(Request $request)
     {
-        $request->token()->delete();
+        $request->user()->tokens()->delete();
 
         return response()->json([
             'msg' => 'Logout'

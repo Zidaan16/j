@@ -2,15 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Classroom;
 use App\Models\Exam;
-use App\Models\Role;
-use App\Models\Student;
-use App\Models\Teacher;
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,54 +14,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $student = Role::create([
-            'name' => 'student'
-        ]);
+        // seeder
+        $this->call(Role::class);
+        $this->call(User::class);
+        $this->call(Classroom::class);
 
-        $teacher = Role::create([
-            'name' => 'teacher'
-        ]);
-
-        $teacher->user()->create([
-            'name' => 'Irpan',
-            'email' => 'irpan@info.id',
-            'password' => Hash::make('irpan'),
-        ]);
-
-        $rpl1 = Classroom::create([
-            'name' => 'rpl1'
-        ]);
-        $rpl2 = Classroom::create([
-            'name' => 'rpl2'
-        ]);
-        $tkj1 = Classroom::create([
-            'name' => 'tkj1'
-        ]);
-        $tkj2 = Classroom::create([
-            'name' => 'tkj2'
-        ]);
-
-        $student->user()->create([
+        \App\Models\Role::find(1)->user()->create([
+            'classroom_id' => 1,
             'name' => 'Syed Juned',
             'email' => 'juned@info.id',
             'password' => Hash::make('juned'),
-            'classroom_id' => $rpl1->id,
+            'status' => 1
+        ]);
+
+        \App\Models\User::factory()->count(28)->for(\App\Models\Classroom::find(1))->create([
             'status' => true
         ]);
 
-        $student->user()->create([
-            'name' => 'Melati',
-            'email' => 'melati@info.id',
-            'password' => Hash::make('melati'),
-            'classroom_id' => $rpl1->id,
+        \App\Models\User::factory()->count(30)->for(\App\Models\Classroom::find(2))->create([
             'status' => true
         ]);
 
-        $student->user()->create([
-            'name' => 'Zidan',
-            'email' => 'zidan@info.id',
-            'password' => Hash::make('zidan'),
-            'classroom_id' => $rpl1->id,
+        \App\Models\User::factory()->count(30)->for(\App\Models\Classroom::find(3))->create([
+            'status' => false
         ]);
 
         $exam = Exam::create([
@@ -95,8 +65,33 @@ class DatabaseSeeder extends Seeder
 
         $exam->question()->create([
             'point' => 5,
-            'description' => '1000 + 2000cu = ...?',
+            'description' => '1000 + 2000 = ...?',
             'auto' => false
+        ]);
+
+
+        $exam = Exam::create([
+            'classroom_id' => 1,
+            'title' => 'PPKN',
+
+        ]);
+
+        $exam->question()->create([
+            'point' => 1,
+            'description' => 'Siapakah presiden pertama Republik Indonesia?',
+            'option_1' => 'Prabowo',
+            'option_2' => 'Anies',
+            'option_3' => 'Ganjar',
+            'correct_answer' => 'Ir. Soekarno'
+        ]);
+
+        $exam->question()->create([
+            'point' => 1,
+            'description' => 'Warna bendera negara Republik Indonesia?',
+            'option_1' => 'Hitam',
+            'option_2' => 'Merah hijau',
+            'option_3' => 'Merah kuning hijau',
+            'correct_answer' => 'Merah Putih'
         ]);
     }
 }

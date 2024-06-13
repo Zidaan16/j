@@ -60,4 +60,14 @@ class User extends Authenticatable
         return $this->belongsTo(Classroom::class);
     }
 
+    public function score()
+    {
+        return $this->hasMany(Score::class);
+    }
+
+    public function answer()
+    {
+        return $this->hasMany(Answer::class);
+    }
+
 }

@@ -9,19 +9,20 @@ class Score extends Model
 {
     protected $table = 'score';
     protected $fillable = [
-        'student_id',
+        'user_id',
         'exam_id',
+        'true',
         'total'
     ];
-
-    public function student()
-    {
-        return $this->belongsTo(Student::class);
-    }
 
     public function exam()
     {
         return $this->belongsTo(Exam::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     use HasFactory;
